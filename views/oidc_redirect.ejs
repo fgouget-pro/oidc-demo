@@ -1,0 +1,42 @@
+<html>
+
+<head></head>
+
+<body>
+
+    <h1>After OIDC Redirect</h1>
+
+
+    <h3>Code</h3>
+    <%= code %>
+        <hr>
+        <h3>State</h3>
+        <%= state %>
+            <hr>
+        <h3>Retour de l'appel token:</h3>
+        <% Object.keys(data).forEach(function(prop) { %>
+            <div><b><%- prop %> :</b> <%- data[prop] %></div>
+        <% }); %>
+
+        
+
+        <button onclick="getUserInfo()">Get UserInfo</button>
+
+                <div id="userInfo"></div>
+
+    <script>
+        async function getUserInfo() {
+
+            const reply = await fetch("http://localhost:3000/oidc/me", {
+                headers: {
+                    Authorization: "Bearer <%= data.access_token %>"
+                }
+            })
+            const data = await reply.json();
+            document.getElementById("userInfo").innerHTML = JSON.stringify(data);
+        }
+    </script>
+
+</body>
+
+</html>
