@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
     // res.send("<a href=\"\">Login With OIDC PROVIDER</a>")
 })
 
-app.post(`/${config.redirect_path}`, (req, res) => {
+app.post(`/${config.redirect_path}`, async (req, res) => {
     console.log(req.body)
     if (!req.signedCookies || !req.signedCookies.state){
         throw new Error ("Unable to find state")
@@ -40,7 +40,32 @@ app.post(`/${config.redirect_path}`, (req, res) => {
     if (req.body.state !== req.signedCookies.state){
         throw new Error ("States don't match!")
     }
-    res.send("Hello World")
+    
+    let req_body = {
+        code: req.body.code,
+        state: req.body.state,
+        client_secret: config.client_secret,
+        client_id: config.client_id,
+        grant_type: config.grant_type,
+        redirect_uri: config.redirect_uri
+    }
+
+    const response = await fetch(config.token_endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams(req_body).toString()
+    })
+    
+    const data = await response.json();
+
+    let token = data.id_token
+    let [t1, t2, signature] = token.split('.')
+    data.p1 = atob(t1)
+    data.p2 = atob(t2)
+    data.signature = signature
+    res.render("oidc_redirect_demo.ejs", { body:req.body, data })
 })
 
 app.listen(config.app_port, function (err) {

@@ -5,6 +5,8 @@ let config = {
     response_type: "code",
     response_mode: "form_post",
     scope: "openid",
+    grant_type: "authorization_code",
+
     
     // APP SERVER INFO
     app_port: "8080",
@@ -21,5 +23,6 @@ config.app_server = `${config.app_base_server}:${config.app_port}`
 config.oidc_server = `${config.oidc_base_server}:${config.oidc_port}`
 config.redirect_uri = `${config.app_server}/${config.redirect_path}`
 config.auth_endpoint = `${config.oidc_server}/${config.oidc_path}/auth`
+config.token_endpoint = `${config.oidc_server}/${config.oidc_path}/token`
 
 export default config
