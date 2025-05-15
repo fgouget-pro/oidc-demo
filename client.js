@@ -13,7 +13,7 @@ const OIDC_REDIRECT_PATH = "/oidc_redirect"
 const redirect_uri = `${BACKEND_SERVER}${OIDC_REDIRECT_PATH}`
 const client_secret =  "Some_super_secret"
 const auth_method = "client_secret_jwt"
-const scope = "openid name"
+const scope = "openid"
 const COOKIE_SECRET = nanoid()
 
 const __filename = fileURLToPath(import.meta.url);
@@ -63,6 +63,9 @@ app.post(OIDC_REDIRECT_PATH, async (req, res) => {
         data.id_info = atob(t2)
         console.log(data.id_info)
     }
+    if (data.access_token){
+        res.cookie("access_token", access_token, {signed:true})
+    }
 //    res.send(req.body)
     res.render("oidc_redirect.ejs", {code: req.body.code, state: req.body.state, data})
 
@@ -83,7 +86,6 @@ app.get("/", (req, res) => {
 
     res.send(link)
 })
-
 
 app.listen(8080, function (err) {
     if (err) console.error(err)
